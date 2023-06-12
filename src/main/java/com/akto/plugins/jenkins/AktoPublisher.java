@@ -29,12 +29,14 @@ public class AktoPublisher extends Recorder implements SimpleBuildStep {
     private final String aktoDashboardUrl;
     private final String aktoApiKey;
     private final String aktoTestId;
+    private final String aktoStartTestDelay;
 
     @DataBoundConstructor
-    public AktoPublisher(String aktoDashboardUrl, String aktoApiKey, String aktoTestId) {
+    public AktoPublisher(String aktoDashboardUrl, String aktoApiKey, String aktoTestId, String aktoStartTestDelay) {
         this.aktoDashboardUrl = aktoDashboardUrl;
         this.aktoApiKey = aktoApiKey;
         this.aktoTestId = aktoTestId;
+        this.aktoStartTestDelay = aktoStartTestDelay;
     }
 
     public String getAktoDashboardUrl() {
@@ -49,17 +51,42 @@ public class AktoPublisher extends Recorder implements SimpleBuildStep {
         return aktoTestId;
     }
 
+    public String getAktostartTestDelay() {
+        return aktoStartTestDelay;
+    }
+
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, EnvVars env, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-     
+        long startTimestamp = 0;
+
+        if (aktoStartTestDelay != "") {
+            try {
+                int delay = Integer.parseInt(aktoStartTestDelay);
+                startTimestamp = System.currentTimeMillis() / 1000 + delay;
+            } catch (NumberFormatException e) {
+                listener.getLogger().println("aktoStartTestDelay should be an integer" + e);
+            }
+        }
+
+        String aktoStartTestEndpoint = "";
+
+        if (aktoDashboardUrl.endsWith("/")) {
+            aktoStartTestEndpoint = aktoDashboardUrl + "api/startTest";
+        } else {
+            aktoStartTestEndpoint = aktoDashboardUrl + "/api/startTest";
+        }
+
         OkHttpClient client = new OkHttpClient();
 
         JSONObject aktoTestJson = new JSONObject();
         aktoTestJson.put("testingRunHexId", aktoTestId);
-        aktoTestJson.put("startTimestamp", 0);  
+        aktoTestJson.put("startTimestamp", startTimestamp);  
         
         JSONObject metadata = new JSONObject();
         metadata.put("platform", "Jenkins");
+
+        //todo: add metadata from built in Jenkins variables
+
         aktoTestJson.put("metadata", metadata);        
 
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -67,7 +94,7 @@ public class AktoPublisher extends Recorder implements SimpleBuildStep {
 
         Request request = 
             new Request.Builder()
-            .url(aktoDashboardUrl + "api/startTest")
+            .url(aktoStartTestEndpoint)
             .header("Content-Type", "application/json")
             .header("X-API-KEY", aktoApiKey)
             .post(body)
@@ -79,7 +106,6 @@ public class AktoPublisher extends Recorder implements SimpleBuildStep {
         } catch (Exception e) {
             listener.getLogger().println("Could not trigger Akto CI/CD test!" + e);
         }
-
     }
 
     @Symbol("akto")
