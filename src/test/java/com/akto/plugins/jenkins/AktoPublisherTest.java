@@ -16,42 +16,45 @@ public class AktoPublisherTest {
     private final String aktoDashboardUrl = "";
     private final String aktoApiKey = "";
     private final String aktoTestId = "";
+    private final String aktoStartTestDelay = "";
+
 
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
     
-    // @Test
-    // public void testBuild() throws Exception {
-    //     FreeStyleProject project = jenkins.createFreeStyleProject();
-    //     AktoPublisher publisher = new AktoPublisher(aktoDashboardUrl, aktoApiKey, aktoTestId);
-    //     project.getPublishersList().add(publisher);
-    //     FreeStyleBuild build = new FreeStyleBuild(project);
+    @Test
+    public void testBuild() throws Exception {
+        FreeStyleProject project = jenkins.createFreeStyleProject();
+        AktoPublisher publisher = new AktoPublisher(aktoDashboardUrl, aktoApiKey, aktoTestId, aktoStartTestDelay);
+        project.getPublishersList().add(publisher);
+        FreeStyleBuild build = new FreeStyleBuild(project);
     
-    //     try {
-    //         build = jenkins.buildAndAssertSuccess(project);
-    //     } catch(Exception e) {
-    //         System.out.println(e.getMessage());
-    //     } 
-    //     build.getLog(100).forEach(System.out::println);
-    //     Assert.assertTrue("true", true);
-    // }
+        try {
+            build = jenkins.buildAndAssertSuccess(project);
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        } 
+        build.getLog(100).forEach(System.out::println);
+        Assert.assertTrue("true", true);
+    }
 
-    // @Test
-    // public void testScriptedPipeline() throws Exception {
-    //     String agentLabel = "my-agent";
-    //     jenkins.createOnlineSlave(Label.get(agentLabel));
-    //     WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
-    //     String pipelineScript
-    //         = "node {\n"
-    //         + "  akto(aktoDashboardUrl:'" + aktoDashboardUrl + "', aktoApiKey:'"+ aktoApiKey +"', aktoTestId: '" + aktoTestId + "')\n"
-    //         + "}";
-    //     System.out.println(pipelineScript);
-    //     job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-    //     WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
-    //     completedBuild.getLog(100).forEach(System.out::println);
-    //     Assert.assertTrue("true", true);
+    @Test
+    public void testScriptedPipeline() throws Exception {
+        String agentLabel = "my-agent";
+        jenkins.createOnlineSlave(Label.get(agentLabel));
+        WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
+        String pipelineScript
+            = "node {\n"
+            + "  akto(aktoDashboardUrl:'" + aktoDashboardUrl + "', aktoApiKey:'"+ aktoApiKey +"', aktoTestId: '" + aktoTestId + "')\n"
+            + "}";
+        System.out.println(pipelineScript);
+        job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
+        completedBuild.getLog(100).forEach(System.out::println);
+        Assert.assertTrue("true", true);
         //String expectedString = "Hello, " + name + "!";
         //jenkins.assertLogContains(expectedString, completedBuild);
+    }
 
     // @Test
     // public void testDeclarativePipeline() throws Exception {

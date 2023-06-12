@@ -103,9 +103,12 @@ public class AktoPublisher extends Recorder implements SimpleBuildStep {
             .post(body)
             .build();
 
+        String resultsUrl = aktoDashboardUrl + "dashboard/testing/" + aktoTestId + "/results";
+
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
             listener.getLogger().println("Triggered API test in Akto successfully!");
+            listener.getLogger().println("You can view the results at " + resultsUrl);
         } catch (Exception e) {
             listener.getLogger().println("Could not trigger Akto CI/CD test!" + e);
         }
