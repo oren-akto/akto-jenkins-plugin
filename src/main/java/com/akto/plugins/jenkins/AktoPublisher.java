@@ -22,6 +22,8 @@ import okhttp3.Response;
 
 import org.jenkinsci.Symbol;
 
+import org.json.JSONObject;
+
 public class AktoPublisher extends Recorder implements SimpleBuildStep {
 
     private final String aktoDashboardUrl;
@@ -52,8 +54,16 @@ public class AktoPublisher extends Recorder implements SimpleBuildStep {
      
         OkHttpClient client = new OkHttpClient();
 
+        JSONObject aktoTestJson = new JSONObject();
+        aktoTestJson.put("testingRunHexId", aktoTestId);
+        aktoTestJson.put("startTimestamp", 0);  
+        
+        JSONObject metadata = new JSONObject();
+        metadata.put("platform", "Jenkins");
+        aktoTestJson.put("metadata", metadata);        
+
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        RequestBody body = RequestBody.create(aktoTestId, JSON);
+        RequestBody body = RequestBody.create(aktoTestJson.toString(), JSON);
 
         Request request = 
             new Request.Builder()
