@@ -24,7 +24,7 @@ Declarative syntax:
 
 ```groovy
 node {
-	akto aktoApiKey: 'AKTO_API_KEY', aktoDashboardUrl: 'AKTO_DASHBOARD_URL', aktoTestId: 'AKTO_TEST_ID'
+	akto aktoApiKey: 'AKTO_API_KEY', aktoDashboardUrl: 'AKTO_DASHBOARD_URL', aktoTestId: 'AKTO_TEST_ID', aktoStartTestDelay: 'AKTO_START_TEST_DELAY'
 }
 ```
 
@@ -41,7 +41,7 @@ pipeline {
     }  
   }  
   post {  
-      akto aktoApiKey: 'AKTO_API_KEY', aktoDashboardUrl: 'AKTO_DASHBOARD_URL', aktoTestId: 'AKTO_TEST_ID'
+      akto aktoApiKey: 'AKTO_API_KEY', aktoDashboardUrl: 'AKTO_DASHBOARD_URL', aktoTestId: 'AKTO_TEST_ID', aktoStartTestDelay: 'AKTO_START_TEST_DELAY'
   }  
 }
 ```

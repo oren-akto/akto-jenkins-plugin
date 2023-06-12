@@ -59,7 +59,7 @@ public class AktoPublisher extends Recorder implements SimpleBuildStep {
     public void perform(Run<?, ?> run, FilePath workspace, EnvVars env, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
         long startTimestamp = 0;
 
-        if (aktoStartTestDelay != "") {
+        if (!aktoStartTestDelay.equals("")) {
             try {
                 int delay = Integer.parseInt(aktoStartTestDelay);
                 startTimestamp = System.currentTimeMillis() / 1000 + delay;
@@ -86,6 +86,9 @@ public class AktoPublisher extends Recorder implements SimpleBuildStep {
         metadata.put("platform", "Jenkins");
 
         //todo: add metadata from built in Jenkins variables
+        metadata.put("repository_url", env.getOrDefault("GIT_URL", ""));
+        metadata.put("branch", env.getOrDefault("GIT_BRANCH", ""));
+        metadata.put("commit_sha", env.getOrDefault("GIT_COMMIT", ""));
 
         aktoTestJson.put("metadata", metadata);        
 
